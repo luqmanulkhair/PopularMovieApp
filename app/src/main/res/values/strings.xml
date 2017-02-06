@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">KICK!</string>
+    <string name="pop">Popular</string>
+    <string name="top">Top Rated</string>
+    <string name="title_movie_detail">Movie Detail</string>
+
+</resources>
