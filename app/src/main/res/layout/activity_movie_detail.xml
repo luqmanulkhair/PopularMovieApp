@@ -18,14 +18,14 @@
     <TextView
         android:id="@+id/mtitle"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:background="#25916b"
-        android:textColor="#ffffffff"
-        android:textSize="30sp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="40dp"
-        android:paddingBottom="16dp"
+        android:layout_height="@dimen/activity_horizontal_margin_large"
+        android:background="@color/colorBack"
+        android:textColor="@color/colorTxt"
+        android:textSize="@dimen/text_size_xlarge"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_horizontal_margin_medum"
+        android:paddingBottom="@dimen/activity_vertical_margin"
         />
 
     <RelativeLayout
@@ -48,21 +48,21 @@
             android:id="@+id/mrelease"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="13dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin_small"
             android:layout_toRightOf="@+id/mposter"
             android:textStyle="bold"
-            android:textSize="23sp" />
+            android:textSize="@dimen/text_size_large" />
 
         <TextView
             android:id="@+id/mrating"
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/mrelease"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="13dp"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin_small"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin_small"
             android:layout_toRightOf="@+id/mposter"
             android:textStyle="italic"
-            android:textSize="17sp" />
+            android:textSize="@dimen/text_size_small" />
 
 
     </RelativeLayout>
@@ -71,9 +71,8 @@
         android:id="@+id/mdesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxLines="9"
         android:scrollbars="vertical"
-        android:textSize="20sp"
+        android:textSize="@dimen/text_size_medium"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"

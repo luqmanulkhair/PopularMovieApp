@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -14,10 +15,13 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity{
 
     private MoviesAdapter moviesAdapter;
-    private RecyclerView moviePosters;
+    @BindView(R.id.movie_posters) RecyclerView moviePosters;
 
     private String filter = "popular";
 
@@ -26,9 +30,9 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        moviePosters = (RecyclerView) findViewById(R.id.movie_posters);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,2);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this,calculateNoColumns(this));
         moviePosters.setLayoutManager(gridLayoutManager);
         moviePosters.setHasFixedSize(true);
 
@@ -43,7 +47,9 @@ public class MainActivity extends AppCompatActivity{
         }
 
         this.setTitle(Constants.POPMOVIE);
-        new MovieDBTask(this).execute(filter);
+        if(NetworkUtils.checkNetworkAval(this)) {
+            new MovieDBTask(this).execute(filter);
+        }
 
     }
 
@@ -71,16 +77,19 @@ public class MainActivity extends AppCompatActivity{
         int id = item.getItemId();
 
         if (id == R.id.action_pop) {
-
-            this.setTitle(Constants.POPMOVIE);
-            new MovieDBTask(this).execute("popular");
-            filter = "popular";
+            if(NetworkUtils.checkNetworkAval(this)){
+                this.setTitle(Constants.POPMOVIE);
+                new MovieDBTask(this).execute("popular");
+                filter = "popular";
+            }
             return true;
 
         }else if (id == R.id.action_top) {
-            this.setTitle(Constants.TOPMOVIE);
-            new MovieDBTask(this).execute("top_rated");
-            filter = "top_rated";
+            if(NetworkUtils.checkNetworkAval(this)) {
+                this.setTitle(Constants.TOPMOVIE);
+                new MovieDBTask(this).execute("top_rated");
+                filter = "top_rated";
+            }
             return true;
 
         }
@@ -120,5 +129,12 @@ public class MainActivity extends AppCompatActivity{
             }
 
         }
+    }
+
+    private int calculateNoColumns(Context context) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int noColumns = (int) (dpWidth / 180);
+        return noColumns;
     }
 }
