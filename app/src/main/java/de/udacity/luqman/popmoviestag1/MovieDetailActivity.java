@@ -28,11 +28,11 @@ public class MovieDetailActivity extends AppCompatActivity {
         if (bundle != null){
             Movie movie = bundle.getParcelable("movie");
 
-            title.setText(movie.getOriginalTitle());
-            releaseDate.setText(movie.getReleaseDate());
-            description.setText(movie.getPlotSynopsis());
-            rating.setText(movie.getUserRatings());
-            Picasso.with(this).load(movie.getPosterPath()).into(poster);
+            title.setText(movie.getTitle());
+            releaseDate.setText(movie.getRelease_date());
+            description.setText(movie.getOverview());
+            rating.setText(movie.getVote_average());
+            Picasso.with(this).load(movie.getPoster_path()).into(poster);
         }
 
 

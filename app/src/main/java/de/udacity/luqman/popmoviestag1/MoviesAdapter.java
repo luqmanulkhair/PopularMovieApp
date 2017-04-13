@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,10 +25,18 @@ import butterknife.ButterKnife;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder> {
 
     private Context context;
-    private ArrayList<Movie> movieList;
+    private List<Movie> movieList;
 
-    public MoviesAdapter(Context context,ArrayList<Movie> movieList) {
+    public MoviesAdapter(Context context,List<Movie> movieList) {
         this.context = context;
+        this.movieList = movieList;
+    }
+
+    public MoviesAdapter(Context context) {
+        this.context = context;
+    }
+
+    public void setMovieList(ArrayList<Movie> movieList) {
         this.movieList = movieList;
     }
 
@@ -43,7 +52,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     @Override
     public void onBindViewHolder(MoviesAdapterViewHolder holder, int position) {
-        Picasso.with(context).load(movieList.get(position).getPosterPath()).into(holder.gridItemMoviePoster);
+        Picasso.with(context).load(movieList.get(position).getPoster_path()).into(holder.gridItemMoviePoster);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package de.udacity.luqman.popmoviestag1;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -10,13 +9,12 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.json.JSONException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity{
 
         this.setTitle(Constants.POPMOVIE);
         if(NetworkUtils.checkNetworkAval(this)) {
-            new MovieDBTask(this).execute(filter);
+            subscribeService(MovieDBUtils.initilizeMovieDBService(),filter,new MovieDBObserver(this));
         }
 
     }
@@ -79,7 +77,7 @@ public class MainActivity extends AppCompatActivity{
         if (id == R.id.action_pop) {
             if(NetworkUtils.checkNetworkAval(this)){
                 this.setTitle(Constants.POPMOVIE);
-                new MovieDBTask(this).execute("popular");
+                subscribeService(MovieDBUtils.initilizeMovieDBService(),"popular",new MovieDBObserver(this));
                 filter = "popular";
             }
             return true;
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity{
         }else if (id == R.id.action_top) {
             if(NetworkUtils.checkNetworkAval(this)) {
                 this.setTitle(Constants.TOPMOVIE);
-                new MovieDBTask(this).execute("top_rated");
+                subscribeService(MovieDBUtils.initilizeMovieDBService(),"top_rated",new MovieDBObserver(this));
                 filter = "top_rated";
             }
             return true;
@@ -97,39 +95,46 @@ public class MainActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    public class MovieDBTask extends AsyncTask<String,Void,ArrayList<Movie>>{
+    public class MovieDBObserver implements Observer<MovieResponse> {
+
         Context context;
 
-        public MovieDBTask(Context context) {
+        public MovieDBObserver(Context context) {
             this.context = context;
         }
 
         @Override
-        protected ArrayList<Movie> doInBackground(String... filter) {
-
-            try {
-                return MovieDBUtils.downloadMovies(filter[0]);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            } catch (JSONException e) {
-                e.printStackTrace();
-                return null;
-            }
+        public void onCompleted() {
 
         }
 
         @Override
-        protected  void onPostExecute(ArrayList<Movie> movieList){
+        public void onError(Throwable e) {
+            e.printStackTrace();
+        }
 
-            if(null!=movieList && movieList.size() > 0){
-                moviesAdapter = new MoviesAdapter(context, movieList);
+        @Override
+        public void onNext(MovieResponse movieResponse) {
+            if(null!=movieResponse && movieResponse.getResults().size() > 0){
+                moviesAdapter = new MoviesAdapter(context, movieResponse.getResults());
                 moviePosters.setAdapter(moviesAdapter);
             }
-
         }
+
     }
+
+
+    public static void subscribeService(MovieDBService movieDBService,String filter,MovieDBObserver movieDBObserver){
+
+        Observable<MovieResponse> moviesObservable = movieDBService.getMovies(filter,Constants.APIKEY);
+
+        moviesObservable.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(movieDBObserver);
+
+    }
+
+
 
     private int calculateNoColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();

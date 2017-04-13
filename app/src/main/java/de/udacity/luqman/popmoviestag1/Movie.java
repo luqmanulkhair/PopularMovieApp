@@ -10,64 +10,66 @@ import android.os.Parcelable;
 public class Movie implements Parcelable {
 
 
-    private String originalTitle;
+    private String title;
 
-    private String plotSynopsis;
+    private String overview;
 
-    private String userRatings;
+    private String vote_average;
 
-    private String releaseDate;
+    private String release_date;
 
-    private String posterPath;
+    private String poster_path;
 
-    public Movie(String originalTitle, String plotSynopsis, String userRatings, String releaseDate, String posterPath) {
-        this.originalTitle = originalTitle;
-        this.plotSynopsis = plotSynopsis;
-        this.userRatings = userRatings;
-        this.releaseDate = releaseDate;
-        this.posterPath = posterPath;
+    public Movie() {}
+
+    public Movie(String title, String overview, String userRatings, String release_date, String poster_path) {
+        this.title = title;
+        this.overview = overview;
+        this.vote_average = userRatings;
+        this.release_date = release_date;
+        this.poster_path = poster_path;
     }
 
-    public String getReleaseDate() {
-        return releaseDate;
+    public String getRelease_date() {
+        return release_date.split("-")[0];
     }
 
-    public void setReleaseDate(String releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setRelease_date(String release_date) {
+        this.release_date = release_date;
     }
 
-    public String getOriginalTitle() {
-        return originalTitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setOriginalTitle(String originalTitle) {
-        this.originalTitle = originalTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getPlotSynopsis() {
-        return plotSynopsis;
+    public String getOverview() {
+        return overview;
     }
 
-    public void setPlotSynopsis(String plotSynopsis) {
-        this.plotSynopsis = plotSynopsis;
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
-    public String getUserRatings() {
-        return userRatings;
+    public String getVote_average() {
+        return vote_average.concat("/10");
     }
 
-    public void setUserRatings(String userRatings) {
-        this.userRatings = userRatings;
+    public void setVote_average(String vote_average) {
+        this.vote_average = vote_average;
     }
 
-    public String getPosterPath()
+    public String getPoster_path()
     {
-        return "http://image.tmdb.org/t/p/w185/"+ posterPath;
+        return "http://image.tmdb.org/t/p/w185/"+ poster_path;
     }
 
-    public void setPosterPath(String posterPath) {
+    public void setPoster_path(String poster_path) {
 
-        this.posterPath = posterPath;
+        this.poster_path = poster_path;
     }
 
     @Override
@@ -77,11 +79,11 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(originalTitle);
-        parcel.writeString(plotSynopsis);
-        parcel.writeString(userRatings);
-        parcel.writeString(releaseDate);
-        parcel.writeString(posterPath);
+        parcel.writeString(title);
+        parcel.writeString(overview);
+        parcel.writeString(vote_average);
+        parcel.writeString(release_date);
+        parcel.writeString(poster_path);
     }
 
     public static final Parcelable.Creator<Movie> CREATOR
@@ -96,10 +98,12 @@ public class Movie implements Parcelable {
     };
 
     private Movie(Parcel in) {
-        originalTitle = in.readString();
-        plotSynopsis = in.readString();
-        userRatings = in.readString();
-        releaseDate = in.readString();
-        posterPath = in.readString();
+        title = in.readString();
+        overview = in.readString();
+        vote_average = in.readString();
+        release_date = in.readString();
+        poster_path = in.readString();
     }
+
+
 }
