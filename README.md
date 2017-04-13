@@ -1,4 +1,4 @@
-# PopularMoviestage1
+# PopularMoviestage2
 
 This is fist part of PopularMovies in Udacity Associate Android Developer Fast Track.
 
@@ -8,4 +8,4 @@ This is fist part of PopularMovies in Udacity Associate Android Developer Fast T
 Add proper themoviedb api key in Constants.java file.
 
 
-### PopularMoviestage2
+
