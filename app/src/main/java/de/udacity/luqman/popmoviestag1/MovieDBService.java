@@ -2,7 +2,6 @@ package de.udacity.luqman.popmoviestag1;
 
 import retrofit2.http.GET;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 import rx.Observable;
 
 /**
@@ -11,9 +10,13 @@ import rx.Observable;
 
 public interface MovieDBService {
 
+    @GET("movie/{filter}?api_key="+Constants.APIKEY)
+    public Observable<MovieResponse> getMovies(@Path("filter") String filter);
 
+    @GET("movie/{id}/videos?api_key="+Constants.APIKEY)
+    public Observable<TrailerResponse> getTrailers(@Path("id") Long id);
 
-    @GET("movie/{filter}")
-    public Observable<MovieResponse> getMovies(@Path("filter") String filter, @Query("api_key") String apiKey);
+    @GET("movie/{id}/reviews?api_key="+Constants.APIKEY)
+    public Observable<ReviewResponse> getReviews(@Path("id") int id);
 
 }

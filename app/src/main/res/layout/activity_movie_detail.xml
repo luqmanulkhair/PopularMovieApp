@@ -77,5 +77,31 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/activity_vertical_margin_small"
+        android:background="@android:color/darker_gray" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="@string/title_trailer"
+        android:textSize="16dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_small"
+        />
+
+
+    <ListView
+        android:id="@+id/trailers_listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_small"
+        ></ListView>
+
+
+
 </LinearLayout>
 </ScrollView>

@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity{
 
         this.setTitle(Constants.POPMOVIE);
         if(NetworkUtils.checkNetworkAval(this)) {
-            subscribeService(MovieDBUtils.initilizeMovieDBService(),filter,new MovieDBObserver(this));
+            subscribeService(MovieDBUtils.initilizeMovieDBService(),filter,new MovieObserver(this));
         }
 
     }
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity{
         if (id == R.id.action_pop) {
             if(NetworkUtils.checkNetworkAval(this)){
                 this.setTitle(Constants.POPMOVIE);
-                subscribeService(MovieDBUtils.initilizeMovieDBService(),"popular",new MovieDBObserver(this));
+                subscribeService(MovieDBUtils.initilizeMovieDBService(),"popular",new MovieObserver(this));
                 filter = "popular";
             }
             return true;
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity{
         }else if (id == R.id.action_top) {
             if(NetworkUtils.checkNetworkAval(this)) {
                 this.setTitle(Constants.TOPMOVIE);
-                subscribeService(MovieDBUtils.initilizeMovieDBService(),"top_rated",new MovieDBObserver(this));
+                subscribeService(MovieDBUtils.initilizeMovieDBService(),"top_rated",new MovieObserver(this));
                 filter = "top_rated";
             }
             return true;
@@ -95,11 +95,11 @@ public class MainActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    public class MovieDBObserver implements Observer<MovieResponse> {
+    public class MovieObserver implements Observer<MovieResponse> {
 
         Context context;
 
-        public MovieDBObserver(Context context) {
+        public MovieObserver(Context context) {
             this.context = context;
         }
 
@@ -124,13 +124,13 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-    public static void subscribeService(MovieDBService movieDBService,String filter,MovieDBObserver movieDBObserver){
+    public static void subscribeService(MovieDBService movieDBService,String filter,MovieObserver movieObserver){
 
-        Observable<MovieResponse> moviesObservable = movieDBService.getMovies(filter,Constants.APIKEY);
+        Observable<MovieResponse> moviesObservable = movieDBService.getMovies(filter);
 
         moviesObservable.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movieDBObserver);
+                .subscribe(movieObserver);
 
     }
 
