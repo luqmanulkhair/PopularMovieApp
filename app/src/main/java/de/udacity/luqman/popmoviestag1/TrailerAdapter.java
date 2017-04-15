@@ -1,7 +1,6 @@
 package de.udacity.luqman.popmoviestag1;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,6 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
         super(context, 0, trailers);
     }
 
-    @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 

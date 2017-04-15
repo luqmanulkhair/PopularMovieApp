@@ -30,6 +30,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.mdesc) TextView description;
     @BindView(R.id.mrating) TextView rating;
     @BindView(R.id.trailers_listview) ListView trailersListView;
+    @BindView(R.id.reviews_listview) ListView reviewsListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,10 @@ public class MovieDetailActivity extends AppCompatActivity {
 
 
             //set Trailers
-            subscribeService(MovieDBUtils.initilizeMovieDBService(),movie.getId(),new MovieDetailActivity.TrailerObserver(this));
+            subscribeTrailerService(MovieDBUtils.initilizeMovieDBService(),movie.getId(),new MovieDetailActivity.TrailerObserver(this));
+
+            //set Reviews
+            subscribeReviewService(MovieDBUtils.initilizeMovieDBService(),movie.getId(),new MovieDetailActivity.ReviewObserver(this));
 
         }
 
@@ -96,7 +100,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     }
 
-    public static void subscribeService(MovieDBService movieDBService,Long id,MovieDetailActivity.TrailerObserver trailerObserver){
+    public static void subscribeTrailerService(MovieDBService movieDBService, Long id, MovieDetailActivity.TrailerObserver trailerObserver){
 
         Observable<TrailerResponse> trailerObservable = movieDBService.getTrailers(id);
 
@@ -105,6 +109,72 @@ public class MovieDetailActivity extends AppCompatActivity {
                 .subscribe(trailerObserver);
 
     }
+
+    public class ReviewObserver implements Observer<ReviewResponse> {
+
+        Context context;
+
+        public ReviewObserver(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void onCompleted() {
+
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            Log.e("xxxxx",e.getMessage());
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onNext(ReviewResponse reviewResponse) {
+
+            Log.e("size: ",String.valueOf(reviewResponse.getResults().size())  );
+
+            if(null!=reviewResponse && reviewResponse.getResults().size() > 0){
+                final ReviewAdapter reviewAdapter = new ReviewAdapter((Activity) context,reviewResponse.getResults());
+                reviewsListView.setAdapter(reviewAdapter);
+                MovieDBUtils.resizeListView(reviewsListView);
+
+                reviewsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        Review review = reviewAdapter.getItem(i);
+                        TextView reviewTextView = (TextView) view.findViewById(R.id.review);
+
+                        if(review.getExpand() == false){
+                            reviewTextView.setMaxLines(Integer.MAX_VALUE);
+                            reviewsListView.invalidateViews();
+                            review.setExpand(true);
+                        }else{
+                            reviewTextView.setMaxLines(5);
+                            reviewsListView.invalidateViews();
+                            review.setExpand(false);
+                        }
+
+
+                    }
+                });
+
+            }
+        }
+
+    }
+
+
+    public static void subscribeReviewService(MovieDBService movieDBService, Long id, MovieDetailActivity.ReviewObserver reviewObserver){
+
+        Observable<ReviewResponse> reviewObservable = movieDBService.getReviews(id);
+
+        reviewObservable.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(reviewObserver);
+
+    }
+
 
 
 }

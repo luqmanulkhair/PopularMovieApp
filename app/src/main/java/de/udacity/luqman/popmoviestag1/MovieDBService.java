@@ -17,6 +17,6 @@ public interface MovieDBService {
     public Observable<TrailerResponse> getTrailers(@Path("id") Long id);
 
     @GET("movie/{id}/reviews?api_key="+Constants.APIKEY)
-    public Observable<ReviewResponse> getReviews(@Path("id") int id);
+    public Observable<ReviewResponse> getReviews(@Path("id") Long id);
 
 }
