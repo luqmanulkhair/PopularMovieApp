@@ -27,6 +27,10 @@
                        android:value="de.udacity.luqman.popmoviestag1.MainActivity" />
 
         </activity>
+        <provider
+            android:authorities="de.udacity.luqman.popmovieapp"
+            android:multiprocess="true"
+            android:name="de.udacity.luqman.popmoviestag1.MovieContentProvider"></provider>
     </application>
 
 </manifest>

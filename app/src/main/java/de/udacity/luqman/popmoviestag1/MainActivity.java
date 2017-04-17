@@ -1,6 +1,7 @@
 package de.udacity.luqman.popmoviestag1;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -8,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,15 +41,24 @@ public class MainActivity extends AppCompatActivity{
             filter = savedInstanceState.getString("filter");
             if(filter.equalsIgnoreCase("popular")){
                 this.setTitle(Constants.POPMOVIE);
-            }else{
+                if (NetworkUtils.checkNetworkAval(this)) {
+                    subscribeService(MovieDBUtils.initilizeMovieDBService(), filter, new MovieObserver(this));
+                }
+            }else if(filter.equalsIgnoreCase("top_rated")){
                 this.setTitle(Constants.TOPMOVIE);
+                if (NetworkUtils.checkNetworkAval(this)) {
+                    subscribeService(MovieDBUtils.initilizeMovieDBService(), filter, new MovieObserver(this));
+                }
+            }else{
+                this.setTitle(Constants.FAVMOVIE);
+                loadContentProvider();
             }
 
-        }
-
-        this.setTitle(Constants.POPMOVIE);
-        if(NetworkUtils.checkNetworkAval(this)) {
-            subscribeService(MovieDBUtils.initilizeMovieDBService(),filter,new MovieObserver(this));
+        }else {
+            this.setTitle(Constants.POPMOVIE);
+            if (NetworkUtils.checkNetworkAval(this)) {
+                subscribeService(MovieDBUtils.initilizeMovieDBService(), filter, new MovieObserver(this));
+            }
         }
 
     }
@@ -87,6 +99,13 @@ public class MainActivity extends AppCompatActivity{
                 this.setTitle(Constants.TOPMOVIE);
                 subscribeService(MovieDBUtils.initilizeMovieDBService(),"top_rated",new MovieObserver(this));
                 filter = "top_rated";
+            }
+            return true;
+
+        }else if (id == R.id.action_fav) {
+            if(NetworkUtils.checkNetworkAval(this)) {
+                this.setTitle(Constants.FAVMOVIE);
+                loadContentProvider();
             }
             return true;
 
@@ -131,6 +150,51 @@ public class MainActivity extends AppCompatActivity{
         moviesObservable.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(movieObserver);
+
+    }
+
+    private void loadContentProvider(){
+        Cursor moviesCursor = this.getContentResolver().query(
+                FavMovieContract.FavMovieEntry.CONTENT_URI,
+                new String[]{
+                        FavMovieContract.FavMovieEntry._ID,
+                        FavMovieContract.FavMovieEntry.COLUMN_MOVIE_ID,
+                        FavMovieContract.FavMovieEntry.COLUMN_TITLE,
+                        FavMovieContract.FavMovieEntry.COLUMN_POSTER,
+                        FavMovieContract.FavMovieEntry.COLUMN_YEAR,
+                        FavMovieContract.FavMovieEntry.COLUMN_RATING,
+                        FavMovieContract.FavMovieEntry.COLUMN_DESCRIPTION,
+
+
+                },null,null,null
+        );
+
+
+
+        if (null != moviesCursor && moviesCursor.moveToFirst()) {
+            ArrayList<Movie> moviesList = new ArrayList<Movie>();
+            while (moviesCursor.isAfterLast() == false) {
+
+                Movie movie = new Movie();
+                movie.setId(Long.valueOf(moviesCursor.getString(moviesCursor.getColumnIndex(FavMovieContract.FavMovieEntry.COLUMN_MOVIE_ID))).longValue());
+                movie.setOverview(moviesCursor.getString(moviesCursor.getColumnIndex(FavMovieContract.FavMovieEntry.COLUMN_DESCRIPTION)));
+                movie.setPoster_path(moviesCursor.getString(moviesCursor.getColumnIndex(FavMovieContract.FavMovieEntry.COLUMN_POSTER)));
+                movie.setRelease_date(moviesCursor.getString(moviesCursor.getColumnIndex(FavMovieContract.FavMovieEntry.COLUMN_YEAR)));
+                movie.setTitle(moviesCursor.getString(moviesCursor.getColumnIndex(FavMovieContract.FavMovieEntry.COLUMN_TITLE)));
+                movie.setVote_average(moviesCursor.getString(moviesCursor.getColumnIndex(FavMovieContract.FavMovieEntry.COLUMN_RATING)));
+
+                moviesList.add(movie);
+                moviesCursor.moveToNext();
+            }
+
+
+
+
+            moviesAdapter = new MoviesAdapter(this, moviesList);
+            moviePosters.setAdapter(moviesAdapter);
+            filter = "fav";
+
+        }
 
     }
 

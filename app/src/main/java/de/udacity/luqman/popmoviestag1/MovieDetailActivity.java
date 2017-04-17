@@ -1,14 +1,17 @@
 package de.udacity.luqman.popmoviestag1;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -31,6 +34,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     @BindView(R.id.mrating) TextView rating;
     @BindView(R.id.trailers_listview) ListView trailersListView;
     @BindView(R.id.reviews_listview) ListView reviewsListView;
+    @BindView(R.id.button_fav) Button favButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,20 +44,42 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         Bundle bundle = this.getIntent().getExtras();
         if (bundle != null){
-            Movie movie = bundle.getParcelable("movie");
+            final Movie movie = bundle.getParcelable("movie");
 
             title.setText(movie.getTitle());
             releaseDate.setText(movie.getRelease_date());
             description.setText(movie.getOverview());
             rating.setText(movie.getVote_average());
-            Picasso.with(this).load(movie.getPoster_path()).into(poster);
+            Picasso.with(this).load(Constants.POSTER_URL+movie.getPoster_path()).into(poster);
+
+            if(isFavorite(movie.getId())){
+                favButton.setText("MARK AS UNFAV");
+            }else{
+                favButton.setText("MARK AS FAV");
+            }
 
 
-            //set Trailers
-            subscribeTrailerService(MovieDBUtils.initilizeMovieDBService(),movie.getId(),new MovieDetailActivity.TrailerObserver(this));
+            if (NetworkUtils.checkNetworkAval(this)) {
+                //set Trailers
+                subscribeTrailerService(MovieDBUtils.initilizeMovieDBService(), movie.getId(), new MovieDetailActivity.TrailerObserver(this));
+            }
 
-            //set Reviews
-            subscribeReviewService(MovieDBUtils.initilizeMovieDBService(),movie.getId(),new MovieDetailActivity.ReviewObserver(this));
+            if (NetworkUtils.checkNetworkAval(this)) {
+                //set Reviews
+                subscribeReviewService(MovieDBUtils.initilizeMovieDBService(), movie.getId(), new MovieDetailActivity.ReviewObserver(this));
+            }
+
+            favButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if(isFavorite(movie.getId())){
+                        removeFav(v,movie.getId());
+                        favButton.setText("MARK AS FAV");
+                    }else {
+                        addFavorite(v, movie);
+                        favButton.setText("MARK AS UNFAV");;
+                    }
+                }
+            });
 
         }
 
@@ -172,6 +198,60 @@ public class MovieDetailActivity extends AppCompatActivity {
         reviewObservable.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(reviewObserver);
+
+    }
+
+
+    private boolean isFavorite(Long movieId) {
+
+        boolean isFavorite = false;
+        Cursor movieCursor = this.getContentResolver().query(
+                FavMovieContract.FavMovieEntry.CONTENT_URI,
+                new String[]{
+                        FavMovieContract.FavMovieEntry._ID,
+                        FavMovieContract.FavMovieEntry.COLUMN_MOVIE_ID
+                },
+                FavMovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
+                new String[]{String.valueOf(movieId)},
+                null);
+
+        if (null != movieCursor && movieCursor.moveToFirst()) {
+            isFavorite = true;
+            movieCursor.close();
+        }
+
+        return isFavorite;
+    }
+
+
+    public void addFavorite(View view,Movie movie) {
+
+            ContentValues movieValues = new ContentValues();
+
+            movieValues.put(FavMovieContract.FavMovieEntry.COLUMN_DESCRIPTION, movie.getOverview());
+            movieValues.put(FavMovieContract.FavMovieEntry.COLUMN_MOVIE_ID, String.valueOf(movie.getId()));
+            movieValues.put(FavMovieContract.FavMovieEntry.COLUMN_POSTER, movie.getPoster_path());
+            movieValues.put(FavMovieContract.FavMovieEntry.COLUMN_RATING, movie.getVote_average());
+            movieValues.put(FavMovieContract.FavMovieEntry.COLUMN_TITLE, movie.getTitle());
+            movieValues.put(FavMovieContract.FavMovieEntry.COLUMN_YEAR, movie.getRelease_date());
+
+            // Finally, insert data into the database.
+            Uri insertedUri = this.getContentResolver().insert(
+                    FavMovieContract.FavMovieEntry.CONTENT_URI,
+                    movieValues
+            );
+
+
+    }
+
+    public void removeFav(View view,Long movieId) {
+
+            // Delete the movies from favorites
+            this.getContentResolver().delete(
+                    FavMovieContract.FavMovieEntry.CONTENT_URI,
+                    FavMovieContract.FavMovieEntry.COLUMN_MOVIE_ID + " = ?",
+                    new String[]{String.valueOf(movieId)}
+            );
 
     }
 

@@ -70,7 +70,7 @@ public class Movie implements Parcelable {
 
     public String getPoster_path()
     {
-        return "http://image.tmdb.org/t/p/w185/"+ poster_path;
+        return poster_path;
     }
 
     public void setPoster_path(String poster_path) {
