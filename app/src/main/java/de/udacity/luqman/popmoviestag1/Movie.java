@@ -61,7 +61,7 @@ public class Movie implements Parcelable {
     }
 
     public String getVote_average() {
-        return vote_average.concat("/10");
+        return vote_average;
     }
 
     public void setVote_average(String vote_average) {

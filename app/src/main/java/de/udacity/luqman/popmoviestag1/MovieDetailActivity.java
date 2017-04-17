@@ -49,7 +49,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             title.setText(movie.getTitle());
             releaseDate.setText(movie.getRelease_date());
             description.setText(movie.getOverview());
-            rating.setText(movie.getVote_average());
+            rating.setText(movie.getVote_average().concat("/10"));
             Picasso.with(this).load(Constants.POSTER_URL+movie.getPoster_path()).into(poster);
 
             if(isFavorite(movie.getId())){
